@@ -20,26 +20,27 @@ const SUBJECTS = {
 };
 
 /** Compress une image en base64 JPEG */
-function compressImage(file, maxSizeKB = 1000) {
+function compressImage(file, maxSizeKB = 800) {
   return new Promise((resolve, reject) => {
     const canvas = document.createElement('canvas');
     const img = new Image();
     img.onload = () => {
       let w = img.width;
       let h = img.height;
-      // Redimensionner si > 2000px
-      if (w > 2000) {
-        h = h * 2000 / w;
-        w = 2000;
+      // Redimensionner pour limiter le poids (max 1500px)
+      const MAX = 1500;
+      if (w > MAX) {
+        h = h * MAX / w;
+        w = MAX;
       }
-      if (h > 2000) {
-        w = w * 2000 / h;
-        h = 2000;
+      if (h > MAX) {
+        w = w * MAX / h;
+        h = MAX;
       }
       canvas.width = w;
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
       resolve(dataUrl.split(',')[1]);
       URL.revokeObjectURL(img.src);
     };

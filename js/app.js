@@ -128,13 +128,16 @@ async function initConfigScreen() {
     return;
   }
 
-  // Détecter la matière
-  let detectedSubject = 'Autre';
-  try {
-    detectedSubject = await detectSubject(state.photos[0].base64);
-  } catch (e) {
-    console.error('Erreur détection matière:', e);
-    handleApiError(e);
+  // Détecter la matière (sauf si une matière par défaut est configurée)
+  const settings = getSettings();
+  let detectedSubject = settings.defaultSubject || '';
+  if (!detectedSubject) {
+    try {
+      detectedSubject = await detectSubject(state.photos[0].base64);
+    } catch (e) {
+      console.error('Erreur détection matière:', e);
+      detectedSubject = 'Autre';
+    }
   }
 
   // Mettre à jour le formulaire
