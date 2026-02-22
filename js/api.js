@@ -3,7 +3,8 @@
    ============================================ */
 
 const API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL = 'claude-sonnet-4-20250514';
+const MODEL_GENERATION = 'claude-sonnet-4-6';
+const MODEL_DETECTION = 'claude-haiku-4-5-20251001';
 const ANTHROPIC_VERSION = '2023-06-01';
 
 /** Liste des matières avec leurs couleurs par défaut */
@@ -121,7 +122,7 @@ async function testApiKey(key) {
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: MODEL,
+      model: MODEL_DETECTION,
       max_tokens: 10,
       messages: [{ role: 'user', content: 'Test' }]
     })
@@ -134,7 +135,7 @@ async function testApiKey(key) {
 /** Détecte la matière scolaire depuis la première image */
 async function detectSubject(imageBase64) {
   const data = await callAnthropic({
-    model: MODEL,
+    model: MODEL_DETECTION,
     max_tokens: 50,
     messages: [{
       role: 'user',
@@ -237,8 +238,8 @@ h3 → sous-sections
 - Retourner UNIQUEMENT le code HTML brut, sans markdown`;
 
   const data = await callAnthropic({
-    model: MODEL,
-    max_tokens: 8000,
+    model: MODEL_GENERATION,
+    max_tokens: 12000,
     system: systemPrompt,
     messages: [{
       role: 'user',
