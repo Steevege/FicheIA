@@ -80,8 +80,20 @@ function renderPhotoGrid() {
     grid.appendChild(div);
   });
 
+  // Bouton "+" toujours visible dans la grille
+  const addDiv = document.createElement('div');
+  addDiv.className = 'photo-thumb photo-add-btn';
+  addDiv.innerHTML = `
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <span>Ajouter</span>
+  `;
+  addDiv.addEventListener('click', () => {
+    document.getElementById('input-gallery').click();
+  });
+  grid.appendChild(addDiv);
+
   const n = state.photos.length;
-  count.textContent = n > 0 ? `${n} photo${n > 1 ? 's' : ''} sélectionnée${n > 1 ? 's' : ''}` : '';
+  count.textContent = n > 0 ? `${n} photo${n > 1 ? 's' : ''} sélectionnée${n > 1 ? 's' : ''}` : 'Aucune photo — ajoute tes notes !';
   btnConfig.disabled = n === 0;
 
   // Événements de suppression
@@ -508,11 +520,17 @@ function init() {
     document.getElementById('input-gallery').click();
   });
 
-  document.getElementById('input-camera').addEventListener('change', (e) => {
+  document.getElementById('input-camera').addEventListener('change', async (e) => {
     if (e.target.files.length > 0) {
-      addPhotos(e.target.files);
+      await addPhotos(e.target.files);
+      e.target.value = '';
+      // Proposer de reprendre une photo
+      if (confirm('Photo ajoutée ! En prendre une autre ?')) {
+        document.getElementById('input-camera').click();
+      }
+    } else {
+      e.target.value = '';
     }
-    e.target.value = '';
   });
 
   document.getElementById('input-gallery').addEventListener('change', (e) => {
