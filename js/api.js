@@ -169,7 +169,27 @@ async function generateFiche(images, config) {
     source: { type: 'base64', media_type: 'image/jpeg', data: img }
   }));
 
+  // Labels pour le prompt
+  const levelLabels = { seconde: 'Seconde (15-16 ans)', premiere: 'Première (16-17 ans)', terminale: 'Terminale (17-18 ans)' };
+  const typeLabels = {
+    revision: 'Fiche de révision : organiser et structurer le contenu pour faciliter la mémorisation. Utiliser des encadrés, listes à puces, mots-clés en gras.',
+    resume: 'Résumé condensé : extraire uniquement les idées essentielles et les points clés. Être le plus concis possible.',
+    flashcards: 'Flashcards : présenter le contenu sous forme de questions/réponses. Chaque flashcard a un recto (question) dans un div.flashcard-q et un verso (réponse) dans un div.flashcard-a.',
+    methode: 'Fiche méthode : structurer sous forme d\'étapes numérotées, de conseils pratiques et de pièges à éviter. Focus sur le "comment faire".'
+  };
+  const densityLabels = {
+    compact: 'COMPACT : tout doit tenir sur 1 seule page (2 colonnes A5). Réduire et condenser le contenu si nécessaire.',
+    normal: 'NORMAL : utiliser le nombre de pages nécessaire, sans forcer la compression.',
+    detaille: 'DÉTAILLÉ : développer les explications, ajouter des exemples si pertinent. Utiliser autant de pages que nécessaire.'
+  };
+
   const systemPrompt = `Tu es un assistant spécialisé dans la transformation de notes manuscrites en fiches HTML imprimables au format A4 paysage (2 colonnes A5).
+
+## CONTEXTE ÉLÈVE
+Niveau : ${levelLabels[config.level] || levelLabels.seconde}
+Type de fiche demandé : ${typeLabels[config.ficheType] || typeLabels.revision}
+Densité : ${densityLabels[config.density] || densityLabels.normal}
+${config.addSynthesis ? 'SYNTHÈSE DEMANDÉE : Ajouter un bloc .synthesis-full à la fin avec une synthèse personnelle des points clés à retenir pour un examen.' : ''}
 
 ## ARCHITECTURE HTML OBLIGATOIRE
 
@@ -208,16 +228,18 @@ li { margin-bottom:6px; line-height:1.4; }
 .box { border:1px solid #ddd; border-radius:8px; padding:12px; margin-bottom:12px; }
 .important { border-left:5px solid var(--main-color); background:#f0f7fb; padding:10px; margin-bottom:12px; }
 .formula-box { background:#f4f4f4; text-align:center; padding:15px; font-weight:bold; border-radius:5px; margin:10px 0; border:1px solid #ccc; font-size:1.2em; }
+.flashcard-q { background:var(--main-color); color:white; padding:10px 14px; border-radius:6px 6px 0 0; font-weight:bold; margin-top:10px; }
+.flashcard-a { background:#f0f7fb; padding:10px 14px; border-radius:0 0 6px 6px; border:1px solid #ddd; border-top:none; margin-bottom:10px; }
 .synthesis-full { background:#fff4e5; border:1.5px solid var(--accent-color); padding:12px; border-radius:8px; margin-top:15px; }
 .tag { font-weight:bold; text-decoration:underline; }
-.spectrum-gradient { height:25px; background:linear-gradient(to right,#8e44ad,#2980b9,#27ae60,#f1c40f,#e67e22,#e74c3c); border-radius:4px; margin:10px 0; border:1px solid #333; }
 @media print { body{background:none;} .page-landscape{box-shadow:none;margin:0;page-break-after:always;} .page-landscape:last-child{page-break-after:auto;} }
 
-## 4 BLOCS STANDARDS
+## BLOCS STANDARDS
 
 .box → sections standard
 .important → définitions clés (bordure gauche colorée)
 .formula-box → formules mathématiques
+.flashcard-q + .flashcard-a → paires question/réponse (mode flashcards)
 .synthesis-full → synthèses/questions d'examen (fond orange)
 
 ## HIÉRARCHIE
@@ -232,8 +254,7 @@ h3 → sous-sections
 - Conserver 100% du contenu manuscrit sans exception
 - Conserver les abréviations exactes ("qd", "tjrs", "→", etc.)
 - Conserver les fautes d'orthographe et de grammaire originales
-- Ne JAMAIS reformuler, synthétiser ou ajouter du contenu
-- Utiliser autant de pages (.page-landscape) que nécessaire
+- Ne JAMAIS reformuler, synthétiser ou ajouter du contenu (sauf si synthèse demandée)
 - Ne pas inclure de panneau UI (géré par l'app)
 - Retourner UNIQUEMENT le code HTML brut, sans markdown`;
 
@@ -249,9 +270,10 @@ h3 → sous-sections
           type: 'text',
           text: `Génère la fiche HTML pour ces notes.
 Matière : ${config.subject}
-Couleur principale : ${config.mainColor}
-Couleur accent : ${config.accentColor}
-Taille de police par défaut : ${config.fontSize}px
+Niveau : ${config.level || 'seconde'}
+Type : ${config.ficheType || 'revision'}
+Densité : ${config.density || 'normal'}
+${config.addSynthesis ? 'Ajoute un bloc de synthèse à la fin.' : ''}
 
 IMPORTANT : Retourne UNIQUEMENT le code HTML complet (commençant par <!DOCTYPE html> ou <div class="page-landscape">), sans markdown, sans backticks, sans explication.`
         }

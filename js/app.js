@@ -177,11 +177,32 @@ function getSelectedColors() {
   return { main: '#2980b9', accent: '#e67e22' };
 }
 
+// --- Pill Pickers ---
+function initPillPickers() {
+  document.querySelectorAll('.pill-picker').forEach(picker => {
+    picker.addEventListener('click', (e) => {
+      const pill = e.target.closest('.pill');
+      if (!pill) return;
+      picker.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+    });
+  });
+}
+
+function getPickerValue(pickerId) {
+  const active = document.querySelector(`#${pickerId} .pill.active`);
+  return active ? active.dataset.value : null;
+}
+
 // --- Génération ---
 async function startGeneration() {
   const subject = document.getElementById('select-subject').value;
   const colors = getSelectedColors();
   const fontSize = parseInt(document.getElementById('slider-fontsize').value);
+  const level = getPickerValue('level-picker') || 'seconde';
+  const ficheType = getPickerValue('type-picker') || 'revision';
+  const density = getPickerValue('density-picker') || 'normal';
+  const addSynthesis = document.getElementById('toggle-synthesis').checked;
 
   navigateTo('viewer');
 
@@ -207,7 +228,11 @@ async function startGeneration() {
       subject,
       mainColor: colors.main,
       accentColor: colors.accent,
-      fontSize
+      fontSize,
+      level,
+      ficheType,
+      density,
+      addSynthesis
     });
 
     stopProgressMessages(state.progressTimers);
@@ -513,6 +538,9 @@ function init() {
   });
 
   document.getElementById('btn-settings').addEventListener('click', openSettings);
+
+  // Pill pickers (niveau, type, densité)
+  initPillPickers();
 
   // Import photos
   document.getElementById('btn-add-camera').addEventListener('click', () => {

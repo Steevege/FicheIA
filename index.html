@@ -94,6 +94,28 @@
             <option value="Autre">Autre</option>
           </select>
 
+          <label class="form-label">Niveau :</label>
+          <div id="level-picker" class="pill-picker">
+            <button class="pill active" data-value="seconde">Seconde</button>
+            <button class="pill" data-value="premiere">Première</button>
+            <button class="pill" data-value="terminale">Terminale</button>
+          </div>
+
+          <label class="form-label">Type de fiche :</label>
+          <div id="type-picker" class="pill-picker">
+            <button class="pill active" data-value="revision">Révision</button>
+            <button class="pill" data-value="resume">Résumé</button>
+            <button class="pill" data-value="flashcards">Flashcards</button>
+            <button class="pill" data-value="methode">Méthode</button>
+          </div>
+
+          <label class="form-label">Densité :</label>
+          <div id="density-picker" class="pill-picker">
+            <button class="pill" data-value="compact">Compact</button>
+            <button class="pill active" data-value="normal">Normal</button>
+            <button class="pill" data-value="detaille">Détaillé</button>
+          </div>
+
           <label class="form-label">Thème couleur :</label>
           <div id="color-picker" class="color-picker">
             <button class="color-dot active" data-main="#2980b9" data-accent="#e67e22" style="background:#2980b9" aria-label="Bleu"></button>
@@ -105,6 +127,14 @@
 
           <label class="form-label">Taille de police : <span id="font-size-value">14</span>px</label>
           <input type="range" id="slider-fontsize" class="form-slider" min="10" max="22" value="14" step="1">
+
+          <div class="toggle-row">
+            <label class="form-label">Ajouter une synthèse</label>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-synthesis">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
 
           <button id="btn-generate" class="btn-primary btn-large btn-generate">
             Générer la fiche
