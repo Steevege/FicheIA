@@ -2,6 +2,26 @@
    FicheIA — Génération et affichage des fiches
    ============================================ */
 
+/** Ajuste la hauteur de l'iframe selon son contenu */
+function resizeIframe(iframe) {
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    const body = doc.body;
+    if (body) {
+      const pages = doc.querySelectorAll('.page-landscape');
+      if (pages.length > 0) {
+        const lastPage = pages[pages.length - 1];
+        const totalHeight = lastPage.offsetTop + lastPage.offsetHeight + 40;
+        iframe.style.height = totalHeight + 'px';
+      } else {
+        iframe.style.height = body.scrollHeight + 60 + 'px';
+      }
+    }
+  } catch (e) {
+    iframe.style.height = '800px';
+  }
+}
+
 /** Affiche le HTML dans l'iframe */
 function renderFicheInIframe(iframe, html) {
   const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -9,26 +29,9 @@ function renderFicheInIframe(iframe, html) {
   doc.write(html);
   doc.close();
 
-  // Ajuster la hauteur de l'iframe selon le contenu
-  setTimeout(() => {
-    try {
-      const body = doc.body;
-      if (body) {
-        const pages = doc.querySelectorAll('.page-landscape');
-        if (pages.length > 0) {
-          // Calculer la hauteur totale des pages + marges
-          const lastPage = pages[pages.length - 1];
-          const totalHeight = lastPage.offsetTop + lastPage.offsetHeight + 40;
-          iframe.style.height = totalHeight + 'px';
-        } else {
-          iframe.style.height = body.scrollHeight + 'px';
-        }
-      }
-    } catch (e) {
-      // Fallback si cross-origin
-      iframe.style.height = '800px';
-    }
-  }, 100);
+  // Ajuster la hauteur après le rendu initial + second passage pour les images/fonts
+  setTimeout(() => resizeIframe(iframe), 150);
+  setTimeout(() => resizeIframe(iframe), 500);
 }
 
 /** Met à jour la taille de police dans l'iframe */
@@ -37,6 +40,8 @@ function updateIframeFontSize(iframe, fontSize) {
     const doc = iframe.contentDocument || iframe.contentWindow.document;
     if (doc && doc.body) {
       doc.body.style.fontSize = fontSize + 'px';
+      // Recalculer la hauteur après changement de taille
+      setTimeout(() => resizeIframe(iframe), 100);
     }
   } catch (e) {
     // Ignorer les erreurs cross-origin
