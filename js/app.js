@@ -316,13 +316,33 @@ function handleRegenerate() {
   // Le formulaire config garde ses valeurs, l'utilisateur peut modifier avant de relancer
 }
 
+/** Injecte une barre de contrôle taille dans le HTML exporté */
+function addToolbarToHtml(html) {
+  const toolbar = `
+<div id="toolbar" style="position:fixed;top:0;left:0;right:0;background:#2980b9;color:white;padding:8px 16px;display:flex;align-items:center;gap:12px;z-index:9999;font-family:sans-serif;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,0.2);print-color-adjust:exact;-webkit-print-color-adjust:exact;">
+  <span>Taille :</span>
+  <input type="range" min="10" max="22" value="14" step="1" oninput="document.body.style.fontSize=this.value+'px';document.getElementById('sz').textContent=this.value+'px'" style="flex:1;max-width:200px;">
+  <span id="sz">14px</span>
+  <button onclick="document.getElementById('toolbar').style.display='none';window.print();document.getElementById('toolbar').style.display='flex'" style="background:white;color:#2980b9;border:none;padding:6px 14px;border-radius:4px;cursor:pointer;font-weight:600;">Imprimer</button>
+</div>
+<style>@media print{#toolbar{display:none!important;}}</style>`;
+
+  // Injecter après <body> ou au début
+  if (html.includes('<body')) {
+    return html.replace(/(<body[^>]*>)/i, '$1' + toolbar);
+  }
+  return toolbar + html;
+}
+
 async function handleShare() {
   if (!state.currentFiche) return;
+
+  const htmlWithToolbar = addToolbarToHtml(state.currentFiche.html);
 
   // Essayer l'API Web Share si disponible (mobile)
   if (navigator.share) {
     try {
-      const blob = new Blob([state.currentFiche.html], { type: 'text/html' });
+      const blob = new Blob([htmlWithToolbar], { type: 'text/html' });
       const file = new File([blob], (state.currentFiche.title || 'fiche') + '.html', { type: 'text/html' });
       await navigator.share({
         title: state.currentFiche.title || 'Ma fiche',
@@ -334,20 +354,15 @@ async function handleShare() {
     }
   }
 
-  // Fallback : copier le HTML dans le presse-papiers
-  try {
-    await navigator.clipboard.writeText(state.currentFiche.html);
-    alert('HTML copié dans le presse-papiers !');
-  } catch (e) {
-    // Dernier fallback : télécharger le fichier
-    const blob = new Blob([state.currentFiche.html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = (state.currentFiche.title || 'fiche') + '.html';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+  // Fallback : télécharger le fichier HTML
+  const blob = new Blob([htmlWithToolbar], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (state.currentFiche.title || 'fiche') + '.html';
+  a.click();
+  URL.revokeObjectURL(url);
+  alert('Fichier HTML téléchargé !');
 }
 
 // --- Historique ---
