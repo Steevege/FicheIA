@@ -47,7 +47,8 @@ function updateHomeScreen() {
 
 // --- Import photos ---
 async function addPhotos(files) {
-  for (const file of files) {
+  const fileArray = Array.from(files);
+  for (const file of fileArray) {
     if (!file.type.startsWith('image/')) continue;
     try {
       const thumbnail = await createThumbnail(file);
