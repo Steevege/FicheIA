@@ -25,7 +25,9 @@ function saveToHistory(fiche) {
     color: fiche.mainColor,
     date: new Date().toISOString(),
     html: fiche.html,
-    fontSize: fiche.fontSize
+    fontSize: fiche.fontSize,
+    type: fiche.type || 'cours',
+    parentId: fiche.parentId || null
   };
   history.unshift(entry);
   if (history.length > MAX_FICHES) history.pop();

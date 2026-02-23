@@ -440,25 +440,43 @@ function renderHistory() {
   empty.hidden = true;
   list.innerHTML = '';
 
+  // Tags par type
+  const typeTagLabels = {
+    cours: 'Cours',
+    questions: 'Questions',
+    exercices: 'Exercices',
+    redaction: 'Rédaction',
+    methode: 'Méthode',
+    chat: 'Chat',
+    libre: 'Libre'
+  };
+
   history.forEach(fiche => {
     const date = new Date(fiche.date);
     const dateStr = date.toLocaleDateString('fr-FR', {
       day: '2-digit', month: '2-digit', year: 'numeric'
     });
 
+    const ficheType = fiche.type || 'cours';
+    const tagLabel = typeTagLabels[ficheType] || 'Cours';
+    const isChild = !!fiche.parentId;
+
     const card = document.createElement('div');
-    card.className = 'history-card';
+    card.className = 'history-card' + (isChild ? ' child-card' : '');
     card.innerHTML = `
       <button class="btn-icon btn-fav${fiche.favorite ? ' active' : ''}" data-id="${fiche.id}" aria-label="Favori">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="${fiche.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       </button>
       <div class="history-color" style="background:${fiche.color}"></div>
       <div class="history-info">
-        <div class="history-subject">${fiche.subject}</div>
+        <div class="history-subject">${fiche.subject}<span class="history-type-tag tag-${ficheType}">${tagLabel}</span></div>
         <div class="history-title">${fiche.title}</div>
         <div class="history-date">${dateStr}</div>
       </div>
       <div class="history-actions">
+        <button class="btn-icon btn-work" data-id="${fiche.id}" aria-label="Travailler" title="Travailler">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        </button>
         <button class="btn-icon btn-rename" data-id="${fiche.id}" data-title="${(fiche.title || '').replace(/"/g, '&quot;')}" aria-label="Renommer">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
         </button>
@@ -482,6 +500,23 @@ function renderHistory() {
       e.stopPropagation();
       toggleFavorite(btn.dataset.id);
       renderHistory();
+    });
+  });
+
+  // Événements travailler
+  list.querySelectorAll('.btn-work').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const fiche = getFicheById(btn.dataset.id);
+      if (fiche) {
+        initWorkMode({
+          html: fiche.html,
+          subject: fiche.subject,
+          title: fiche.title,
+          id: fiche.id,
+          mainColor: fiche.color
+        });
+      }
     });
   });
 
@@ -949,6 +984,18 @@ function init() {
   document.getElementById('btn-copy-text').addEventListener('click', handleCopyText);
   document.getElementById('btn-fullscreen').addEventListener('click', toggleFullscreen);
 
+  // Bouton Travailler depuis le Viewer
+  document.getElementById('btn-work').addEventListener('click', () => {
+    if (!state.currentFiche) return;
+    initWorkMode({
+      html: state.currentFiche.html,
+      subject: state.currentFiche.subject,
+      title: state.currentFiche.title,
+      id: state.currentFiche.id || null,
+      mainColor: state.currentFiche.mainColor
+    });
+  });
+
   // Éditeur
   document.getElementById('btn-close-editor').addEventListener('click', () => {
     document.getElementById('editor-overlay').hidden = true;
@@ -1040,6 +1087,25 @@ function init() {
     darkToggle.addEventListener('change', () => {
       document.body.classList.toggle('dark', darkToggle.checked);
       saveSettings({ darkMode: darkToggle.checked });
+    });
+  }
+
+  // Work mode listeners
+  initWorkListeners();
+
+  // Sliders comptage (questions et exercices)
+  const questionsCount = document.getElementById('work-questions-count');
+  const questionsLabel = document.getElementById('work-questions-count-label');
+  if (questionsCount && questionsLabel) {
+    questionsCount.addEventListener('input', () => {
+      questionsLabel.textContent = questionsCount.value;
+    });
+  }
+  const exercicesCount = document.getElementById('work-exercices-count');
+  const exercicesLabel = document.getElementById('work-exercices-count-label');
+  if (exercicesCount && exercicesLabel) {
+    exercicesCount.addEventListener('input', () => {
+      exercicesLabel.textContent = exercicesCount.value;
     });
   }
 

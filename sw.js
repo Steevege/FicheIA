@@ -1,4 +1,4 @@
-const CACHE = 'ficheIA-v8';
+const CACHE = 'ficheIA-v9';
 const ASSETS = [
   './',
   './index.html',
@@ -7,7 +7,8 @@ const ASSETS = [
   './js/api.js',
   './js/generator.js',
   './js/history.js',
-  './js/pdf.js'
+  './js/pdf.js',
+  './js/work.js'
 ];
 
 self.addEventListener('install', (e) => {

@@ -960,6 +960,205 @@ body {
   }
 }
 
+/* --- Mode Travailler --- */
+.work-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.work-source {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  padding: 8px 12px;
+  background: var(--surface);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary);
+}
+
+.work-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.work-panel-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.btn-work-back {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.work-free-row {
+  display: flex;
+  gap: 8px;
+}
+
+.work-free-row .form-input {
+  flex: 1;
+}
+
+.btn-free-go {
+  padding: 12px 16px;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: var(--radius);
+}
+
+.work-modes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.work-mode-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  transition: border-color 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.work-mode-btn:active {
+  border-color: var(--primary);
+  transform: scale(0.96);
+}
+
+.work-mode-btn svg {
+  color: var(--primary);
+}
+
+/* --- Chat --- */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 200px;
+  max-height: 50vh;
+  padding: 8px 0;
+}
+
+.chat-bubble {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.chat-user {
+  align-self: flex-end;
+  background: var(--primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-assistant {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-input-bar {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.chat-textarea {
+  flex: 1;
+  min-height: 44px;
+  max-height: 100px;
+  resize: none;
+}
+
+.btn-chat-send {
+  padding: 10px 14px;
+  min-width: 48px;
+  min-height: 44px;
+  border-radius: var(--radius);
+  flex-shrink: 0;
+}
+
+.btn-chat-to-fiche {
+  font-size: 0.85rem;
+  min-height: 40px;
+}
+
+.chat-loading {
+  padding: 8px 14px;
+  font-size: 1.2rem;
+  color: var(--text-light);
+}
+
+.chat-dots span {
+  animation: chatDot 1.4s infinite;
+  display: inline-block;
+}
+.chat-dots span:nth-child(2) { animation-delay: 0.2s; }
+.chat-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes chatDot {
+  0%, 80%, 100% { opacity: 0.2; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-4px); }
+}
+
+/* --- Tags type fiche (historique) --- */
+.history-type-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: 10px;
+  color: white;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.tag-cours { background: var(--primary); }
+.tag-questions { background: #27ae60; }
+.tag-exercices { background: #e67e22; }
+.tag-redaction { background: #8e44ad; }
+.tag-methode { background: #e74c3c; }
+.tag-chat { background: #7f8c8d; }
+.tag-libre { background: #2980b9; }
+
+/* Carte enfant (indentée) */
+.history-card.child-card {
+  margin-left: 24px;
+  border-left: 3px solid var(--primary);
+}
+
 /* --- Mode sombre --- */
 body.dark {
   --bg: #1a1a2e;
@@ -989,4 +1188,25 @@ body.dark .editor-header {
 
 body.dark .fiche-container {
   background: #111;
+}
+
+body.dark .work-mode-btn {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+body.dark .work-mode-btn svg {
+  color: #5dade2;
+}
+
+body.dark .chat-assistant {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+body.dark .work-source {
+  background: var(--surface);
+  border-left-color: #5dade2;
 }
