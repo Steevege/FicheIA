@@ -65,6 +65,16 @@ function toggleFavorite(id) {
   return fiche ? fiche.favorite : false;
 }
 
+/** Renomme une fiche */
+function renameFiche(id, newTitle) {
+  const history = getHistory();
+  const fiche = history.find(f => f.id === id);
+  if (fiche) {
+    fiche.title = newTitle;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  }
+}
+
 /** Duplique une fiche */
 function duplicateFiche(id) {
   const history = getHistory();

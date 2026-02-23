@@ -254,6 +254,9 @@ async function startGeneration() {
     progressEl.hidden = true;
     containerEl.hidden = false;
 
+    // Notifier si l'onglet n'est pas actif
+    notifyGenerationDone(state.currentFiche.title);
+
   } catch (e) {
     stopProgressMessages(state.progressTimers);
     console.error('Erreur génération:', e);
@@ -438,6 +441,9 @@ function renderHistory() {
         <div class="history-date">${dateStr}</div>
       </div>
       <div class="history-actions">
+        <button class="btn-icon btn-rename" data-id="${fiche.id}" data-title="${(fiche.title || '').replace(/"/g, '&quot;')}" aria-label="Renommer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+        </button>
         <button class="btn-icon btn-duplicate" data-id="${fiche.id}" aria-label="Dupliquer">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         </button>
@@ -458,6 +464,18 @@ function renderHistory() {
       e.stopPropagation();
       toggleFavorite(btn.dataset.id);
       renderHistory();
+    });
+  });
+
+  // Événements renommer
+  list.querySelectorAll('.btn-rename').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const newTitle = prompt('Nouveau titre :', btn.dataset.title);
+      if (newTitle && newTitle.trim()) {
+        renameFiche(btn.dataset.id, newTitle.trim());
+        renderHistory();
+      }
     });
   });
 
@@ -649,6 +667,100 @@ function showError(message) {
   alert(message);
 }
 
+// --- Drag & Drop ---
+function initDragDrop() {
+  const dropZone = document.getElementById('drop-zone');
+  const overlay = document.getElementById('drop-overlay');
+  if (!dropZone) return;
+
+  let dragCounter = 0;
+
+  dropZone.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    dragCounter++;
+    overlay.hidden = false;
+  });
+
+  dropZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter <= 0) {
+      dragCounter = 0;
+      overlay.hidden = true;
+    }
+  });
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dragCounter = 0;
+    overlay.hidden = true;
+    if (e.dataTransfer.files.length > 0) {
+      addPhotos(e.dataTransfer.files);
+    }
+  });
+}
+
+// --- Notification de fin ---
+function notifyGenerationDone(title) {
+  if (document.hasFocus()) return;
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    new Notification('FicheIA', { body: 'Fiche "' + title + '" prête !', icon: 'assets/icon-192.png' });
+  }
+}
+
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+// --- Plein écran ---
+function toggleFullscreen() {
+  const container = document.getElementById('fiche-container');
+  if (!container) return;
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else {
+    container.requestFullscreen().catch(() => {});
+  }
+}
+
+// --- Raccourcis clavier ---
+function initKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // Ignorer si dans un input/textarea
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
+    const isViewer = document.getElementById('screen-viewer').classList.contains('active');
+    if (!isViewer) return;
+
+    const mod = e.metaKey || e.ctrlKey;
+
+    if (mod && e.key === 'p') {
+      e.preventDefault();
+      handlePrint();
+    } else if (mod && e.key === 's') {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'f' && !mod) {
+      toggleFullscreen();
+    } else if (e.key === 'Escape') {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        const editor = document.getElementById('editor-overlay');
+        if (!editor.hidden) editor.hidden = true;
+      }
+    }
+  });
+}
+
 // --- Initialisation ---
 function init() {
   // Pré-remplir la clé API au premier lancement
@@ -678,6 +790,15 @@ function init() {
 
   // Pill pickers (niveau, type, densité)
   initPillPickers();
+
+  // Drag & drop photos
+  initDragDrop();
+
+  // Raccourcis clavier
+  initKeyboardShortcuts();
+
+  // Demander la permission de notification
+  requestNotificationPermission();
 
   // Import photos
   document.getElementById('btn-add-camera').addEventListener('click', () => {
@@ -759,6 +880,7 @@ function init() {
   document.getElementById('btn-edit').addEventListener('click', handleEdit);
   document.getElementById('btn-regenerate').addEventListener('click', handleRegenerate);
   document.getElementById('btn-share').addEventListener('click', handleShare);
+  document.getElementById('btn-fullscreen').addEventListener('click', toggleFullscreen);
 
   // Éditeur
   document.getElementById('btn-close-editor').addEventListener('click', () => {

@@ -44,7 +44,11 @@
         <h2 class="header-title">Import photos</h2>
         <div class="header-spacer"></div>
       </header>
-      <main class="import-content">
+      <main class="import-content" id="drop-zone">
+        <div id="drop-overlay" class="drop-overlay" hidden>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p>Glisse tes photos ici</p>
+        </div>
         <div id="photo-grid" class="photo-grid"></div>
         <div class="import-actions">
           <button id="btn-add-camera" class="btn-add" aria-label="Prendre une photo">
@@ -157,6 +161,9 @@
           <label class="toolbar-label">Taille :</label>
           <input type="range" id="slider-viewer-fontsize" class="form-slider toolbar-slider" min="10" max="22" value="14" step="1">
           <span id="viewer-fontsize-value" class="toolbar-value">14px</span>
+          <button id="btn-fullscreen" class="btn-icon" aria-label="Plein écran" style="color:var(--text-light);margin-left:auto;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          </button>
         </div>
         <div id="generation-progress" class="generation-progress" hidden>
           <div class="spinner"></div>

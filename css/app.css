@@ -892,6 +892,37 @@ body {
   margin: 4px 0;
 }
 
+/* --- Drop zone --- */
+.import-content {
+  position: relative;
+}
+
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(41, 128, 185, 0.9);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 20;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* --- Plein écran --- */
+.fiche-container:fullscreen {
+  background: white;
+  overflow: auto;
+}
+
+.fiche-container:fullscreen .fiche-iframe {
+  min-height: 100vh;
+}
+
 /* --- Utilitaires --- */
 @media (min-width: 640px) {
   #app {
