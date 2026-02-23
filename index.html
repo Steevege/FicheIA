@@ -215,6 +215,21 @@
         <div class="header-spacer"></div>
       </header>
       <main class="history-content">
+        <div class="history-filters">
+          <input type="search" id="history-search" class="form-input history-search" placeholder="Rechercher...">
+          <select id="history-filter-subject" class="form-select history-filter-select">
+            <option value="">Toutes matières</option>
+            <option value="Physique-Chimie">Physique-Chimie</option>
+            <option value="Mathématiques">Mathématiques</option>
+            <option value="SVT">SVT</option>
+            <option value="Histoire-Géo">Histoire-Géo</option>
+            <option value="Français">Français</option>
+            <option value="Philosophie">Philosophie</option>
+            <option value="Langues">Langues</option>
+            <option value="Économie">Économie</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
         <div id="history-list" class="history-list"></div>
         <p id="history-empty" class="history-empty" hidden>Aucune fiche sauvegardée</p>
       </main>
@@ -267,6 +282,14 @@
           <div id="model-picker" class="pill-picker">
             <button class="pill active" data-value="sonnet">Sonnet 4.6 (qualité)</button>
             <button class="pill" data-value="haiku">Haiku 4.5 (rapide)</button>
+          </div>
+
+          <div class="toggle-row">
+            <label class="form-label">Mode sombre</label>
+            <label class="toggle">
+              <input type="checkbox" id="toggle-darkmode">
+              <span class="toggle-slider"></span>
+            </label>
           </div>
         </div>
       </div>

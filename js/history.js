@@ -54,6 +54,17 @@ function getFicheById(id) {
   return getHistory().find(f => f.id === id) || null;
 }
 
+/** Toggle favori sur une fiche */
+function toggleFavorite(id) {
+  const history = getHistory();
+  const fiche = history.find(f => f.id === id);
+  if (fiche) {
+    fiche.favorite = !fiche.favorite;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  }
+  return fiche ? fiche.favorite : false;
+}
+
 /** Récupère les paramètres */
 function getSettings() {
   try {

@@ -1,4 +1,4 @@
-const CACHE = 'ficheIA-v4';
+const CACHE = 'ficheIA-v5';
 const ASSETS = [
   './',
   './index.html',

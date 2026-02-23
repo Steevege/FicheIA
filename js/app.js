@@ -369,11 +369,36 @@ async function handleShare() {
 function renderHistory() {
   const list = document.getElementById('history-list');
   const empty = document.getElementById('history-empty');
-  const history = getHistory();
+  const searchInput = document.getElementById('history-search');
+  const filterSelect = document.getElementById('history-filter-subject');
+  let history = getHistory();
+
+  // Filtrer par recherche
+  const searchTerm = (searchInput ? searchInput.value : '').toLowerCase().trim();
+  if (searchTerm) {
+    history = history.filter(f =>
+      (f.title || '').toLowerCase().includes(searchTerm) ||
+      (f.subject || '').toLowerCase().includes(searchTerm)
+    );
+  }
+
+  // Filtrer par matière
+  const subjectFilter = filterSelect ? filterSelect.value : '';
+  if (subjectFilter) {
+    history = history.filter(f => f.subject === subjectFilter);
+  }
+
+  // Trier : favoris en premier
+  history.sort((a, b) => {
+    if (a.favorite && !b.favorite) return -1;
+    if (!a.favorite && b.favorite) return 1;
+    return 0; // garder l'ordre chronologique sinon
+  });
 
   if (history.length === 0) {
     list.innerHTML = '';
     empty.hidden = false;
+    empty.textContent = searchTerm || subjectFilter ? 'Aucune fiche trouvée' : 'Aucune fiche sauvegardée';
     return;
   }
 
@@ -389,6 +414,9 @@ function renderHistory() {
     const card = document.createElement('div');
     card.className = 'history-card';
     card.innerHTML = `
+      <button class="btn-icon btn-fav${fiche.favorite ? ' active' : ''}" data-id="${fiche.id}" aria-label="Favori">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="${fiche.favorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </button>
       <div class="history-color" style="background:${fiche.color}"></div>
       <div class="history-info">
         <div class="history-subject">${fiche.subject}</div>
@@ -407,7 +435,16 @@ function renderHistory() {
     list.appendChild(card);
   });
 
-  // Événements
+  // Événements favoris
+  list.querySelectorAll('.btn-fav').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleFavorite(btn.dataset.id);
+      renderHistory();
+    });
+  });
+
+  // Événements ouvrir
   list.querySelectorAll('.btn-open').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -487,6 +524,12 @@ function openSettings() {
   document.querySelectorAll('#model-picker .pill').forEach(p => {
     p.classList.toggle('active', p.dataset.value === modelValue);
   });
+
+  // Mode sombre
+  const darkToggle = document.getElementById('toggle-darkmode');
+  if (darkToggle) {
+    darkToggle.checked = !!settings.darkMode;
+  }
 
   modal.hidden = false;
 }
@@ -713,6 +756,30 @@ function init() {
   settingsSlider.addEventListener('input', () => {
     settingsFontValue.textContent = settingsSlider.value;
   });
+
+  // Recherche + filtre historique
+  const historySearch = document.getElementById('history-search');
+  const historyFilter = document.getElementById('history-filter-subject');
+  if (historySearch) {
+    historySearch.addEventListener('input', renderHistory);
+  }
+  if (historyFilter) {
+    historyFilter.addEventListener('change', renderHistory);
+  }
+
+  // Mode sombre
+  const darkToggle = document.getElementById('toggle-darkmode');
+  if (darkToggle) {
+    const savedDark = getSettings().darkMode;
+    if (savedDark) {
+      document.body.classList.add('dark');
+      darkToggle.checked = true;
+    }
+    darkToggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark', darkToggle.checked);
+      saveSettings({ darkMode: darkToggle.checked });
+    });
+  }
 
   // Init écran d'accueil
   updateHomeScreen();
