@@ -956,9 +956,9 @@ function init() {
     }
   });
 
-  document.getElementById('input-gallery').addEventListener('change', (e) => {
+  document.getElementById('input-gallery').addEventListener('change', async (e) => {
     if (e.target.files.length > 0) {
-      addPhotos(e.target.files);
+      await addPhotos(e.target.files);
     }
     e.target.value = '';
   });
