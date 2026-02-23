@@ -18,9 +18,14 @@
     <div id="screen-home" class="screen active">
       <header class="app-header">
         <h1 class="app-title">FicheIA</h1>
-        <button id="btn-settings" class="btn-icon" aria-label="Paramètres">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        </button>
+        <div class="header-actions">
+          <button id="btn-help" class="btn-icon" aria-label="Aide">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </button>
+          <button id="btn-settings" class="btn-icon" aria-label="Paramètres">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          </button>
+        </div>
       </header>
       <main class="home-content">
         <button id="btn-new-fiche" class="btn-primary btn-large">
@@ -487,6 +492,106 @@
             <button id="btn-import" class="btn-secondary">Importer</button>
           </div>
           <input type="file" id="input-import" accept=".json" hidden>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL AIDE -->
+    <div id="modal-help" class="modal" hidden>
+      <div class="modal-backdrop"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Aide</h3>
+          <button id="btn-close-help" class="btn-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div class="modal-body">
+
+          <div class="help-section">
+            <h4>FicheIA, c'est quoi ?</h4>
+            <p>Transforme tes photos de notes manuscrites en fiches de révision claires et structurées, grâce à l'IA. Gratuit, sans compte, tout reste sur ton appareil.</p>
+          </div>
+
+          <div class="help-section">
+            <h4>Installer sur ton appareil</h4>
+            <div class="help-platform">
+              <span class="help-platform-icon">📱</span>
+              <div>
+                <strong>iPhone / iPad</strong>
+                <ol class="help-steps">
+                  <li>Ouvre FicheIA dans <strong>Safari</strong></li>
+                  <li>Appuie sur le bouton <strong>Partager</strong> (carré avec flèche)</li>
+                  <li>Choisis <strong>Sur l'écran d'accueil</strong></li>
+                </ol>
+              </div>
+            </div>
+            <div class="help-platform">
+              <span class="help-platform-icon">🤖</span>
+              <div>
+                <strong>Android</strong>
+                <ol class="help-steps">
+                  <li>Ouvre FicheIA dans <strong>Chrome</strong></li>
+                  <li>Appuie sur le menu <strong>&#8942;</strong> (3 points)</li>
+                  <li>Choisis <strong>Installer l'application</strong></li>
+                </ol>
+              </div>
+            </div>
+            <div class="help-platform">
+              <span class="help-platform-icon">💻</span>
+              <div>
+                <strong>Mac</strong>
+                <ol class="help-steps">
+                  <li>Ouvre FicheIA dans <strong>Chrome</strong> ou <strong>Edge</strong></li>
+                  <li>Clique sur l'icône <strong>Installer</strong> dans la barre d'adresse</li>
+                </ol>
+              </div>
+            </div>
+            <div class="help-platform">
+              <span class="help-platform-icon">🪟</span>
+              <div>
+                <strong>PC Windows</strong>
+                <ol class="help-steps">
+                  <li>Ouvre FicheIA dans <strong>Chrome</strong> ou <strong>Edge</strong></li>
+                  <li>Clique sur <strong>Installer</strong> dans la barre d'adresse</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <div class="help-section">
+            <h4>Configurer ta cle API</h4>
+            <ol class="help-steps">
+              <li>Appuie sur l'icône <strong>engrenage</strong> (Paramètres)</li>
+              <li>Entre ta <strong>clé API Anthropic</strong> (commence par sk-ant-...)</li>
+              <li>Appuie sur <strong>Tester</strong> pour vérifier</li>
+              <li>Appuie sur <strong>Sauvegarder</strong></li>
+            </ol>
+          </div>
+
+          <div class="help-section">
+            <h4>Créer une fiche</h4>
+            <ol class="help-steps">
+              <li>Appuie sur <strong>Nouvelle fiche</strong></li>
+              <li>Prends en photo ou importe tes <strong>notes manuscrites</strong></li>
+              <li>Configure la <strong>matière</strong>, le <strong>niveau</strong> et le <strong>type de fiche</strong></li>
+              <li>Appuie sur <strong>Générer la fiche</strong></li>
+              <li>Sauvegarde, imprime ou exporte en PDF</li>
+            </ol>
+          </div>
+
+          <div class="help-section">
+            <h4>Mode Travailler</h4>
+            <p>Depuis une fiche sauvegardée, appuie sur <strong>Travailler</strong> pour :</p>
+            <ul class="help-steps help-list">
+              <li><strong>Questions</strong> — QCM, vrai/faux, questions ouvertes</li>
+              <li><strong>Exercices</strong> — Application, analyse, synthèse</li>
+              <li><strong>Rédaction</strong> — Aide à la dissertation, commentaire</li>
+              <li><strong>Discuter</strong> — Chat avec l'IA sur le cours</li>
+              <li><strong>Méthode</strong> — Fiches méthode personnalisées</li>
+            </ul>
+          </div>
+
         </div>
       </div>
     </div>

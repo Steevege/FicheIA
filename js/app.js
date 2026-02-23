@@ -600,6 +600,15 @@ function openFicheFromHistory(id) {
   renderFicheInIframe(iframe, fiche.html);
 }
 
+// --- Aide ---
+function openHelp() {
+  document.getElementById('modal-help').hidden = false;
+}
+
+function closeHelp() {
+  document.getElementById('modal-help').hidden = true;
+}
+
 // --- Paramètres ---
 function openSettings() {
   const modal = document.getElementById('modal-settings');
@@ -882,6 +891,9 @@ function init() {
   });
 
   document.getElementById('btn-settings').addEventListener('click', openSettings);
+  document.getElementById('btn-help').addEventListener('click', openHelp);
+  document.getElementById('btn-close-help').addEventListener('click', closeHelp);
+  document.getElementById('modal-help').querySelector('.modal-backdrop').addEventListener('click', closeHelp);
 
   // Pill pickers (niveau, type, densité)
   initPillPickers();
