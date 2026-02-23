@@ -480,6 +480,9 @@ function renderHistory() {
         <button class="btn-icon btn-rename" data-id="${fiche.id}" data-title="${(fiche.title || '').replace(/"/g, '&quot;')}" aria-label="Renommer">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
         </button>
+        <button class="btn-icon btn-subject" data-id="${fiche.id}" data-subject="${fiche.subject}" aria-label="Changer matière" title="Changer matière">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        </button>
         <button class="btn-icon btn-duplicate" data-id="${fiche.id}" aria-label="Dupliquer">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
         </button>
@@ -529,6 +532,26 @@ function renderHistory() {
         renameFiche(btn.dataset.id, newTitle.trim());
         renderHistory();
       }
+    });
+  });
+
+  // Événements changer matière
+  list.querySelectorAll('.btn-subject').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const subjects = ['Physique-Chimie', 'Mathématiques', 'SVT', 'Histoire-Géo', 'Français', 'Philosophie', 'Langues', 'Économie', 'Autre'];
+      const current = btn.dataset.subject;
+      const choice = prompt(
+        'Choisir la matière :\n' + subjects.map((s, i) => `${i + 1}. ${s}${s === current ? ' (actuel)' : ''}`).join('\n') + '\n\nEntrer le numéro ou le nom :',
+        current
+      );
+      if (!choice || choice.trim() === '' || choice.trim() === current) return;
+      // Accepter un numéro ou un nom
+      const trimmed = choice.trim();
+      const num = parseInt(trimmed);
+      const newSubject = (num >= 1 && num <= subjects.length) ? subjects[num - 1] : subjects.find(s => s.toLowerCase() === trimmed.toLowerCase()) || trimmed;
+      changeFicheSubject(btn.dataset.id, newSubject);
+      renderHistory();
     });
   });
 
