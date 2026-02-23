@@ -258,9 +258,14 @@ h3 → sous-sections
 - Ne pas inclure de panneau UI (géré par l'app)
 - Retourner UNIQUEMENT le code HTML brut, sans markdown`;
 
+  // Choix du modèle depuis les settings
+  const settings = getSettings();
+  const modelChoice = settings.model || 'sonnet';
+  const generationModel = modelChoice === 'haiku' ? MODEL_DETECTION : MODEL_GENERATION;
+
   const data = await callAnthropic({
-    model: MODEL_GENERATION,
-    max_tokens: 12000,
+    model: generationModel,
+    max_tokens: modelChoice === 'haiku' ? 8000 : 12000,
     system: systemPrompt,
     messages: [{
       role: 'user',

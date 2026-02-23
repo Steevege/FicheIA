@@ -306,6 +306,50 @@ function applyEdit() {
   document.getElementById('editor-overlay').hidden = true;
 }
 
+function handleRegenerate() {
+  if (!state.photos || state.photos.length === 0) {
+    alert('Aucune photo en mémoire. Importe de nouvelles photos.');
+    return;
+  }
+  if (!confirm('Régénérer la fiche avec les mêmes photos ?')) return;
+  navigateTo('config');
+  // Le formulaire config garde ses valeurs, l'utilisateur peut modifier avant de relancer
+}
+
+async function handleShare() {
+  if (!state.currentFiche) return;
+
+  // Essayer l'API Web Share si disponible (mobile)
+  if (navigator.share) {
+    try {
+      const blob = new Blob([state.currentFiche.html], { type: 'text/html' });
+      const file = new File([blob], (state.currentFiche.title || 'fiche') + '.html', { type: 'text/html' });
+      await navigator.share({
+        title: state.currentFiche.title || 'Ma fiche',
+        files: [file]
+      });
+      return;
+    } catch (e) {
+      // Fallback si share annulé ou non supporté pour fichiers
+    }
+  }
+
+  // Fallback : copier le HTML dans le presse-papiers
+  try {
+    await navigator.clipboard.writeText(state.currentFiche.html);
+    alert('HTML copié dans le presse-papiers !');
+  } catch (e) {
+    // Dernier fallback : télécharger le fichier
+    const blob = new Blob([state.currentFiche.html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (state.currentFiche.title || 'fiche') + '.html';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+}
+
 // --- Historique ---
 function renderHistory() {
   const list = document.getElementById('history-list');
@@ -423,6 +467,12 @@ function openSettings() {
   selectSubject.value = settings.defaultSubject || '';
   testResult.textContent = '';
 
+  // Modèle IA
+  const modelValue = settings.model || 'sonnet';
+  document.querySelectorAll('#model-picker .pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.value === modelValue);
+  });
+
   modal.hidden = false;
 }
 
@@ -463,11 +513,14 @@ function saveSettingsForm() {
   const key = document.getElementById('input-api-key').value.trim();
   const fontSize = parseInt(document.getElementById('slider-settings-fontsize').value);
   const subject = document.getElementById('select-default-subject').value;
+  const modelPill = document.querySelector('#model-picker .pill.active');
+  const model = modelPill ? modelPill.dataset.value : 'sonnet';
 
   saveSettings({
     apiKey: key,
     defaultFontSize: fontSize,
-    defaultSubject: subject
+    defaultSubject: subject,
+    model: model
   });
 
   closeSettings();
@@ -620,6 +673,8 @@ function init() {
   document.getElementById('btn-print').addEventListener('click', handlePrint);
   document.getElementById('btn-save').addEventListener('click', handleSave);
   document.getElementById('btn-edit').addEventListener('click', handleEdit);
+  document.getElementById('btn-regenerate').addEventListener('click', handleRegenerate);
+  document.getElementById('btn-share').addEventListener('click', handleShare);
 
   // Éditeur
   document.getElementById('btn-close-editor').addEventListener('click', () => {
