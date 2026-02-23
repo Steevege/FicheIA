@@ -1112,6 +1112,16 @@ function init() {
     e.target.value = '';
   });
 
+  // Forcer la mise à jour
+  document.getElementById('btn-force-update').addEventListener('click', async () => {
+    if (!confirm('Vider le cache et recharger l\'application ?')) return;
+    const keys = await caches.keys();
+    for (const k of keys) await caches.delete(k);
+    const regs = await navigator.serviceWorker.getRegistrations();
+    for (const r of regs) await r.unregister();
+    location.reload(true);
+  });
+
   // Mode sombre
   const darkToggle = document.getElementById('toggle-darkmode');
   if (darkToggle) {
