@@ -229,6 +229,12 @@
             <option value="Économie">Économie</option>
             <option value="Autre">Autre</option>
           </select>
+          <select id="history-sort" class="form-select history-filter-select">
+            <option value="recent">Plus récentes</option>
+            <option value="ancien">Plus anciennes</option>
+            <option value="matiere">Par matière</option>
+            <option value="alpha">Alphabétique</option>
+          </select>
         </div>
         <div id="history-list" class="history-list"></div>
         <p id="history-empty" class="history-empty" hidden>Aucune fiche sauvegardée</p>
@@ -291,6 +297,15 @@
               <span class="toggle-slider"></span>
             </label>
           </div>
+
+          <hr class="settings-divider">
+
+          <label class="form-label">Données :</label>
+          <div class="settings-actions">
+            <button id="btn-export" class="btn-secondary">Exporter</button>
+            <button id="btn-import" class="btn-secondary">Importer</button>
+          </div>
+          <input type="file" id="input-import" accept=".json" hidden>
         </div>
       </div>
     </div>

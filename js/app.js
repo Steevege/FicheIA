@@ -371,6 +371,7 @@ function renderHistory() {
   const empty = document.getElementById('history-empty');
   const searchInput = document.getElementById('history-search');
   const filterSelect = document.getElementById('history-filter-subject');
+  const sortSelect = document.getElementById('history-sort');
   let history = getHistory();
 
   // Filtrer par recherche
@@ -388,11 +389,24 @@ function renderHistory() {
     history = history.filter(f => f.subject === subjectFilter);
   }
 
-  // Trier : favoris en premier
+  // Trier selon le critère choisi
+  const sortValue = sortSelect ? sortSelect.value : 'recent';
   history.sort((a, b) => {
+    // Favoris toujours en premier
     if (a.favorite && !b.favorite) return -1;
     if (!a.favorite && b.favorite) return 1;
-    return 0; // garder l'ordre chronologique sinon
+    // Puis tri secondaire
+    switch (sortValue) {
+      case 'ancien':
+        return new Date(a.date) - new Date(b.date);
+      case 'matiere':
+        return (a.subject || '').localeCompare(b.subject || '', 'fr');
+      case 'alpha':
+        return (a.title || '').localeCompare(b.title || '', 'fr');
+      case 'recent':
+      default:
+        return new Date(b.date) - new Date(a.date);
+    }
   });
 
   if (history.length === 0) {
@@ -424,6 +438,9 @@ function renderHistory() {
         <div class="history-date">${dateStr}</div>
       </div>
       <div class="history-actions">
+        <button class="btn-icon btn-duplicate" data-id="${fiche.id}" aria-label="Dupliquer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
         <button class="btn-icon btn-open" data-id="${fiche.id}" aria-label="Ouvrir">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
@@ -440,6 +457,15 @@ function renderHistory() {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleFavorite(btn.dataset.id);
+      renderHistory();
+    });
+  });
+
+  // Événements dupliquer
+  list.querySelectorAll('.btn-duplicate').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      duplicateFiche(btn.dataset.id);
       renderHistory();
     });
   });
@@ -757,15 +783,43 @@ function init() {
     settingsFontValue.textContent = settingsSlider.value;
   });
 
-  // Recherche + filtre historique
+  // Recherche + filtre + tri historique
   const historySearch = document.getElementById('history-search');
   const historyFilter = document.getElementById('history-filter-subject');
+  const historySort = document.getElementById('history-sort');
   if (historySearch) {
     historySearch.addEventListener('input', renderHistory);
   }
   if (historyFilter) {
     historyFilter.addEventListener('change', renderHistory);
   }
+  if (historySort) {
+    historySort.addEventListener('change', renderHistory);
+  }
+
+  // Export / Import
+  document.getElementById('btn-export').addEventListener('click', () => {
+    exportHistory();
+  });
+  document.getElementById('btn-import').addEventListener('click', () => {
+    document.getElementById('input-import').click();
+  });
+  document.getElementById('input-import').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = importHistory(reader.result);
+      if (result === -1) {
+        alert('Fichier invalide. Utilise un export FicheIA.');
+      } else {
+        alert(result + ' fiche(s) importée(s) !');
+        updateHomeScreen();
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
 
   // Mode sombre
   const darkToggle = document.getElementById('toggle-darkmode');

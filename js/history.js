@@ -65,6 +65,61 @@ function toggleFavorite(id) {
   return fiche ? fiche.favorite : false;
 }
 
+/** Duplique une fiche */
+function duplicateFiche(id) {
+  const history = getHistory();
+  const original = history.find(f => f.id === id);
+  if (!original) return null;
+  const copy = {
+    ...original,
+    id: 'fiche_' + Date.now(),
+    title: original.title + ' (copie)',
+    date: new Date().toISOString(),
+    favorite: false
+  };
+  history.unshift(copy);
+  if (history.length > MAX_FICHES) history.pop();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  return copy;
+}
+
+/** Exporte tout l'historique en JSON */
+function exportHistory() {
+  const history = getHistory();
+  const blob = new Blob([JSON.stringify(history, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ficheIA_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/** Importe un historique depuis un fichier JSON */
+function importHistory(jsonString) {
+  try {
+    const imported = JSON.parse(jsonString);
+    if (!Array.isArray(imported)) throw new Error('Format invalide');
+    const current = getHistory();
+    const existingIds = new Set(current.map(f => f.id));
+    let added = 0;
+    for (const fiche of imported) {
+      if (!fiche.id || !fiche.html) continue;
+      if (existingIds.has(fiche.id)) continue;
+      current.push(fiche);
+      added++;
+    }
+    // Trier par date décroissante
+    current.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // Limiter à MAX_FICHES
+    if (current.length > MAX_FICHES) current.length = MAX_FICHES;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(current));
+    return added;
+  } catch (e) {
+    return -1;
+  }
+}
+
 /** Récupère les paramètres */
 function getSettings() {
   try {
