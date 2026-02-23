@@ -140,6 +140,9 @@
             </label>
           </div>
 
+          <label class="form-label">Instructions pour l'IA :</label>
+          <textarea id="custom-instructions" class="form-textarea" rows="3" placeholder="Ex : insiste sur les dates, ajoute des moyens mnémotechniques..."></textarea>
+
           <button id="btn-generate" class="btn-primary btn-large btn-generate">
             Générer la fiche
           </button>
@@ -192,6 +195,10 @@
           <button id="btn-regenerate" class="btn-action" title="Régénérer la fiche">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
             Refaire
+          </button>
+          <button id="btn-copy-text" class="btn-action" title="Copier le texte">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copier
           </button>
           <button id="btn-share" class="btn-action" title="Copier le HTML">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -296,6 +303,23 @@
             <button class="pill active" data-value="sonnet">Sonnet 4.6 (qualité)</button>
             <button class="pill" data-value="haiku">Haiku 4.5 (rapide)</button>
           </div>
+
+          <hr class="settings-divider">
+
+          <label class="form-label">Instructions par matière :</label>
+          <select id="select-instruction-subject" class="form-select">
+            <option value="Physique-Chimie">Physique-Chimie</option>
+            <option value="Mathématiques">Mathématiques</option>
+            <option value="SVT">SVT</option>
+            <option value="Histoire-Géo">Histoire-Géo</option>
+            <option value="Français">Français</option>
+            <option value="Philosophie">Philosophie</option>
+            <option value="Langues">Langues</option>
+            <option value="Économie">Économie</option>
+            <option value="Autre">Autre</option>
+          </select>
+          <textarea id="subject-instructions" class="form-textarea" rows="2" placeholder="Ex : toujours encadrer les formules, insister sur les démonstrations..."></textarea>
+          <button id="btn-save-instruction" class="btn-secondary" style="align-self:flex-start;">Enregistrer</button>
 
           <div class="toggle-row">
             <label class="form-label">Mode sombre</label>

@@ -190,6 +190,8 @@ Niveau : ${levelLabels[config.level] || levelLabels.seconde}
 Type de fiche demandé : ${typeLabels[config.ficheType] || typeLabels.revision}
 Densité : ${densityLabels[config.density] || densityLabels.normal}
 ${config.addSynthesis ? 'SYNTHÈSE DEMANDÉE : Ajouter un bloc .synthesis-full à la fin avec une synthèse personnelle des points clés à retenir pour un examen.' : ''}
+${config.subjectInstructions ? '\n## INSTRUCTIONS PAR MATIÈRE (consignes par défaut)\n' + config.subjectInstructions : ''}
+${config.customInstructions ? '\n## INSTRUCTIONS PERSONNALISÉES (prioritaires)\n' + config.customInstructions : ''}
 
 ## ARCHITECTURE HTML OBLIGATOIRE
 

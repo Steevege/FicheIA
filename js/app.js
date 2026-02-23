@@ -9,7 +9,8 @@ const DEFAULT_API_KEY = ''; // Renseignée via les paramètres de l'app
 const state = {
   photos: [],        // { file: File, base64: string, thumbnail: string }
   currentFiche: null, // { html, subject, mainColor, accentColor, fontSize, id? }
-  progressTimers: []
+  progressTimers: [],
+  isGenerating: false
 };
 
 // --- Navigation ---
@@ -144,6 +145,13 @@ async function initConfigScreen() {
   selectSubject.value = detectedSubject;
   updateColorsForSubject(detectedSubject);
 
+  // Pré-remplir les instructions par matière
+  const subjectInstructions = (settings.subjectInstructions || {})[detectedSubject] || '';
+  const instructionsField = document.getElementById('custom-instructions');
+  if (instructionsField && subjectInstructions && !instructionsField.value.trim()) {
+    instructionsField.value = subjectInstructions;
+  }
+
   loadingEl.hidden = true;
   formEl.hidden = false;
 }
@@ -203,6 +211,11 @@ async function startGeneration() {
   const ficheType = getPickerValue('type-picker') || 'revision';
   const density = getPickerValue('density-picker') || 'normal';
   const addSynthesis = document.getElementById('toggle-synthesis').checked;
+  const customInstructions = (document.getElementById('custom-instructions').value || '').trim();
+
+  // Charger les instructions par matière
+  const settings = getSettings();
+  const subjectInstructions = (settings.subjectInstructions || {})[subject] || '';
 
   navigateTo('viewer');
 
@@ -221,6 +234,7 @@ async function startGeneration() {
 
   // Messages de progression
   state.progressTimers = startProgressMessages(messageEl);
+  state.isGenerating = true;
 
   try {
     const images = state.photos.map(p => p.base64);
@@ -232,7 +246,9 @@ async function startGeneration() {
       level,
       ficheType,
       density,
-      addSynthesis
+      addSynthesis,
+      customInstructions,
+      subjectInstructions
     });
 
     stopProgressMessages(state.progressTimers);
@@ -253,11 +269,13 @@ async function startGeneration() {
 
     progressEl.hidden = true;
     containerEl.hidden = false;
+    state.isGenerating = false;
 
     // Notifier si l'onglet n'est pas actif
     notifyGenerationDone(state.currentFiche.title);
 
   } catch (e) {
+    state.isGenerating = false;
     stopProgressMessages(state.progressTimers);
     console.error('Erreur génération:', e);
     messageEl.textContent = getErrorMessage(e);
@@ -575,6 +593,14 @@ function openSettings() {
     darkToggle.checked = !!settings.darkMode;
   }
 
+  // Instructions par matière
+  const instrSelect = document.getElementById('select-instruction-subject');
+  const instrText = document.getElementById('subject-instructions');
+  if (instrSelect && instrText) {
+    const si = (settings.subjectInstructions || {})[instrSelect.value] || '';
+    instrText.value = si;
+  }
+
   modal.hidden = false;
 }
 
@@ -665,6 +691,40 @@ function handleApiError(error) {
 
 function showError(message) {
   alert(message);
+}
+
+// --- Copier le texte brut ---
+function handleCopyText() {
+  if (!state.currentFiche) return;
+  const iframe = document.getElementById('fiche-iframe');
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  const text = doc.body ? doc.body.innerText : '';
+  if (!text.trim()) {
+    alert('Aucun contenu à copier.');
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Texte copié dans le presse-papier !');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('Texte copié !');
+  });
+}
+
+// --- Confirmation avant de quitter ---
+function initBeforeUnload() {
+  window.addEventListener('beforeunload', (e) => {
+    if (state.isGenerating) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  });
 }
 
 // --- Drag & Drop ---
@@ -800,6 +860,9 @@ function init() {
   // Demander la permission de notification
   requestNotificationPermission();
 
+  // Confirmation avant de quitter pendant génération
+  initBeforeUnload();
+
   // Import photos
   document.getElementById('btn-add-camera').addEventListener('click', () => {
     document.getElementById('input-camera').click();
@@ -837,6 +900,9 @@ function init() {
   // Configuration
   document.getElementById('select-subject').addEventListener('change', (e) => {
     updateColorsForSubject(e.target.value);
+    // Mettre à jour les instructions par matière
+    const si = (getSettings().subjectInstructions || {})[e.target.value] || '';
+    document.getElementById('custom-instructions').value = si;
   });
 
   document.querySelectorAll('.color-dot').forEach(dot => {
@@ -880,6 +946,7 @@ function init() {
   document.getElementById('btn-edit').addEventListener('click', handleEdit);
   document.getElementById('btn-regenerate').addEventListener('click', handleRegenerate);
   document.getElementById('btn-share').addEventListener('click', handleShare);
+  document.getElementById('btn-copy-text').addEventListener('click', handleCopyText);
   document.getElementById('btn-fullscreen').addEventListener('click', toggleFullscreen);
 
   // Éditeur
@@ -918,6 +985,25 @@ function init() {
   if (historySort) {
     historySort.addEventListener('change', renderHistory);
   }
+
+  // Instructions par matière
+  const instrSubjectSelect = document.getElementById('select-instruction-subject');
+  const instrTextarea = document.getElementById('subject-instructions');
+  if (instrSubjectSelect && instrTextarea) {
+    instrSubjectSelect.addEventListener('change', () => {
+      const si = (getSettings().subjectInstructions || {})[instrSubjectSelect.value] || '';
+      instrTextarea.value = si;
+    });
+  }
+  document.getElementById('btn-save-instruction').addEventListener('click', () => {
+    const subject = instrSubjectSelect.value;
+    const text = instrTextarea.value.trim();
+    const settings = getSettings();
+    const si = settings.subjectInstructions || {};
+    si[subject] = text;
+    saveSettings({ subjectInstructions: si });
+    alert('Instructions pour ' + subject + ' enregistrées !');
+  });
 
   // Export / Import
   document.getElementById('btn-export').addEventListener('click', () => {
