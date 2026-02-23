@@ -108,7 +108,8 @@ async function startWorkGeneration(mode, options) {
     }
 
     // Stocker la fiche courante
-    const title = extractTitleFromHtml(html) || modeLabels[mode];
+    const extracted = extractTitleFromHtml(html);
+    const title = (extracted && extracted !== 'Sans titre') ? extracted : modeLabels[mode];
     state.currentFiche = {
       html,
       subject: workState.sourceFiche.subject,
@@ -470,7 +471,8 @@ async function convertChatToFiche() {
       html = wrapWorkHtml(html, 'chat');
     }
 
-    const title = extractTitleFromHtml(html) || 'Fiche conversation';
+    const extracted2 = extractTitleFromHtml(html);
+    const title = (extracted2 && extracted2 !== 'Sans titre') ? extracted2 : 'Fiche conversation';
     state.currentFiche = {
       html,
       subject: workState.sourceFiche.subject,
