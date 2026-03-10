@@ -170,7 +170,7 @@ async function generateFiche(images, config) {
   }));
 
   // Labels pour le prompt
-  const levelLabels = { seconde: 'Seconde (15-16 ans)', premiere: 'Première (16-17 ans)', terminale: 'Terminale (17-18 ans)' };
+  const levelLabels = { troisieme: 'Troisième (14-15 ans)', seconde: 'Seconde (15-16 ans)', premiere: 'Première (16-17 ans)', terminale: 'Terminale (17-18 ans)' };
   const typeLabels = {
     revision: 'Fiche de révision : organiser et structurer le contenu pour faciliter la mémorisation. Utiliser des encadrés, listes à puces, mots-clés en gras.',
     resume: 'Résumé condensé : extraire uniquement les idées essentielles et les points clés. Être le plus concis possible.',
